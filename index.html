@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medical Coding CMS</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/favicon.png" type="image/png" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      background: linear-gradient(120deg, #4d6581 0%, #870f3d 100%);
+      min-height: 100vh;
+      color: #222;
+      transition: background 0.4s, color 0.4s;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 40px auto;
+      background: rgba(56, 48, 48, 0.367);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+      border-radius: 18px;
+      padding: 36px 32px 32px 32px;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 700;
+      color: #1fa615;
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+    }
+
+    form {
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    textarea,
+    input[type="file"] {
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      padding: 12px;
+      font-size: 1rem;
+      background: rgba(245, 247, 250, 0.8);
+      transition: border 0.2s;
+      outline: none;
+    }
+
+    textarea:focus,
+    input[type="file"]:focus {
+      border: 1.5px solid #4299e1;
+    }
+
+    button {
+      background: linear-gradient(90deg, #4299e1 0%, #3182ce 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(66, 153, 225, 0.08);
+      transition: background 0.2s, box-shadow 0.2s;
+      margin: auto;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #3182ce 0%, #4299e1 100%);
+      box-shadow: 0 4px 16px rgba(66, 153, 225, 0.15);
+    }
+
+    .output-section {
+      margin-top: 32px;
+      background: rgba(240, 248, 255, 0.7);
+      border-radius: 14px;
+      padding: 24px 18px;
+      box-shadow: 0 2px 12px 0 rgba(31, 38, 135, 0.08);
+      min-height: 80px;
+      font-size: 1.08rem;
+      position: relative;
+      overflow-x: auto;
+    }
+
+    .output-section h2 {
+      margin-top: 0;
+      color: #2b6cb0;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .codes-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(66, 153, 225, 0.07);
+    }
+
+    .codes-table th,
+    .codes-table td {
+      padding: 10px 8px;
+      text-align: left;
+    }
+
+    .codes-table th {
+      background: #e2e8f0;
+      color: #2a4365;
+      font-weight: 700;
+      border-bottom: 2px solid #cbd5e1;
+    }
+
+    .codes-table tr:nth-child(even) {
+      background: #f7fafc;
+    }
+
+    .codes-table tr:hover {
+      background: #ebf8ff;
+      transition: background 0.2s;
+    }
+
+    .percent-bar {
+      background: #c6f6d5;
+      border-radius: 6px;
+      height: 18px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .percent-bar-inner {
+      background: linear-gradient(90deg, #3ac49f 0%, #42e1ac 100%);
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.5s;
+    }
+
+    .percent-label {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      font-size: 0.98rem;
+      font-weight: 700;
+      line-height: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        max-width: 98vw;
+        padding: 10vw 2vw;
+      }
+
+      .codes-table {
+        font-size: 0.98rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 2vw 1vw;
+      }
+
+      .output-section {
+        padding: 8px 2px;
+      }
+
+      .codes-table {
+        display: none;
+      }
+
+      .code-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .code-card {
+        background: linear-gradient(120deg, #f7fafc 60%, #e0e7ef 100%);
+        border-radius: 14px;
+        box-shadow: 0 2px 12px 0 rgba(31, 38, 135, 0.08);
+        padding: 16px 12px;
+        border: 2px solid #e2e8f0;
+        position: relative;
+      }
+
+      .code-card.top {
+        border: 2.5px solid #4299e1;
+        background: linear-gradient(120deg, #e0f7fa 60%, #bee3f8 100%);
+        box-shadow: 0 0 8px #bee3f8;
+      }
+
+      .code-card .percent-bar {
+        margin-top: 8px;
+      }
+
+      .code-card .percent-label {
+        left: 90%;
+        font-size: 1em;
+      }
+    }
+
+    /* Dark mode */
+    body.dark {
+      background: linear-gradient(120deg, #1a202c 0%, #2d3748 100%);
+      color: #e2e8f0;
+    }
+
+    body.dark .container {
+      background: rgba(26, 32, 44, 0.95);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    body.dark .codes-table th {
+      background: #4a5568;
+      color: #edf2f7;
+      border-bottom: 2px solid #718096;
+    }
+
+    body.dark .codes-table tr {
+      background: #2d3748;
+
+    }
+
+    body.dark .code-card {
+      background: linear-gradient(120deg, #2d3748 60%, #1a202c 100%);
+      border: 2px solid #4a5568;
+    }
+
+    body.dark .code-card.top {
+      background: linear-gradient(120deg, #285e61 60%, #2c7a7b 100%);
+      border-color: #38b2ac;
+      box-shadow: 0 0 8px #81e6d9;
+    }
+
+    body.dark .percent-label {
+      color: #e2e8f0 !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div style="text-align:right; margin-bottom:-30px;">
+      <button id="toggleModeBtn" title="Toggle Dark/Light Mode"
+        style="font-size: 1.5em; background: none; border: none; cursor: pointer;">
+        <span id="modeIcon">🌞</span>
+      </button>
+    </div>
+
+    <h1>Mr. Coder</h1>
+    <form id="textForm">
+      <label for="text"><b>Enter Medical Text</b></label>
+      <textarea id="text" rows="3" cols="60">Cholera due to Vibrio cholerae</textarea><br />
+      <button type="submit">Submit Text</button>
+    </form>
+    <div id="output" class="output-section" style="display:none;"></div>
+  </div>
+
+  <script>
+    let lastResponse = null;
+    let currentRenderMode = window.innerWidth <= 600 ? 'mobile' : 'desktop';
+    const output = document.getElementById("output");
+    const toggleBtn = document.getElementById("toggleModeBtn");
+    const icon = document.getElementById("modeIcon");
+
+    function isMobile() {
+      return window.innerWidth <= 600;
+    }
+
+    function getContrastColor(hex) {
+      if (!hex.startsWith("#")) return "#000";
+      const r = parseInt(hex.substr(1, 2), 16);
+      const g = parseInt(hex.substr(3, 2), 16);
+      const b = parseInt(hex.substr(5, 2), 16);
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness > 140 ? '#1a202c' : '#f7fafc';
+    }
+
+    function renderResponse(data) {
+      lastResponse = data;
+      if (!data) return;
+      let html = '';
+      if (data.problem) {
+        html += `<h2>Extracted Problem</h2><div style="margin-bottom:10px;">${data.problem}</div>`;
+      }
+      const mode = isMobile() ? 'mobile' : 'desktop';
+      if (mode === 'mobile' && data.suggested_codes?.length) {
+        html += `<h2>Suggested ICD-10 Codes</h2><div class="code-cards">`;
+        data.suggested_codes.forEach((code) => {
+          const isTop = code.match_percent >= 92;
+          const percentColor = code.match_percent >= 98 ? '#42e1ac' : code.match_percent >= 92 ? '#3182ce' : code.match_percent >= 87 ? '#d69e2e' : '#e53e3e';
+          const labelColor = getContrastColor(percentColor);
+          html += `
+            <div class="code-card${isTop ? ' top' : ''}">
+              <div style="font-size:1.1em;font-weight:700;">${isTop ? '⭐ ' : ''}${code.code} <span style="color:#718096;font-size:0.98em;">(${code.code_with_separator})</span></div>
+              <div><b>${code.short_description}</b></div>
+              <div style="color:#4a5568;font-size:0.97em;">${code.long_description}</div>
+              <div>Type: <b>${code.type}</b></div>
+              <div class="percent-bar">
+                <div class="percent-bar-inner" style="width:${code.match_percent}%; background:${percentColor};"></div>
+                <span class="percent-label" style="color:${labelColor};">${code.match_percent.toFixed(1)}%</span>
+              </div>
+              <div style="margin-top:8px;">
+                <button class="feedback-btn" data-code="${code.code}">👍</button>
+                <button class="feedback-btn" data-code="${code.code}">👎</button>
+              </div>
+            </div>`;
+        });
+        html += `</div>`;
+      } else if (data.suggested_codes?.length) {
+        html += `<h2>Suggested ICD-10 Codes</h2><table class="codes-table">
+          <tr>
+            <th>Code</th>
+            <th>Code (with Separator)</th>
+            <th>Description</th>
+            <th>Type</th>
+            <th>Match %</th>
+            <th>Feedback</th>
+          </tr>`;
+        data.suggested_codes.forEach((code) => {
+          const isTop = code.match_percent >= 92;
+          const percentColor = code.match_percent >= 98 ? '#42e1ac' : code.match_percent >= 92 ? '#3182ce' : code.match_percent >= 87 ? '#d69e2e' : '#e53e3e';
+          const labelColor = getContrastColor(percentColor);
+          html += `<tr style="${isTop ? 'border: 2.5px solid #4299e1;' : ''}">
+            <td><b>${isTop ? '⭐ ' : ''}${code.code}</b></td>
+            <td>${code.code_with_separator}</td>
+            <td><span title="${code.long_description}">${code.short_description}</span></td>
+            <td>${code.type}</td>
+            <td>
+              <div class="percent-bar">
+                <div class="percent-bar-inner" style="width:${code.match_percent}%; background:${percentColor};"></div>
+                <span class="percent-label" style="color:${labelColor};">${code.match_percent.toFixed(1)}%</span>
+              </div>
+            </td>
+            <td><button class="feedback-btn" data-code="${code.code}">👍</button> <button class="feedback-btn" data-code="${code.code}">👎</button></td>
+          </tr>`;
+        });
+        html += `</table>`;
+      } else {
+        html += '<div style="color:#e53e3e;">No codes found for this input.</div>';
+      }
+      output.innerHTML = html;
+      output.style.display = 'block';
+      document.querySelectorAll('.feedback-btn').forEach(btn => {
+        btn.onclick = () => showToast('Thank you for your feedback!', 'success');
+      });
+    }
+
+    function showLoading(msg = '') {
+      let loading = document.createElement('div');
+      loading.id = 'loading-toast';
+      let startTime = new Date().getTime();
+      let timeSpan = document.createElement('span');
+      timeSpan.id = 'loading-time';
+
+      loading.innerHTML = `
+    <span style="margin-right:10px;vertical-align:middle;">
+      <svg width="26" height="26" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="#2a4365" stroke-width="5" stroke-linecap="round" stroke-dasharray="31.415, 31.415" transform="rotate(72.0001 25 25)"><animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="0.8s" repeatCount="indefinite"/></circle></svg>
+    </span>
+    <span>${msg} </span>
+  `;
+      loading.appendChild(timeSpan);
+
+      Object.assign(loading.style, {
+        position: 'fixed', top: '2.5%', left: '50%',
+        transform: 'translateX(-50%)',
+        background: '#f7fafc', color: '#2a4365',
+        padding: '1em 2em',
+        borderRadius: '1.5em',
+        fontWeight: '500', fontSize: '1rem',
+        border: '1px solid #cbd5e1',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
+        zIndex: 9999
+      });
+
+      document.body.appendChild(loading);
+
+      function updateTime() {
+        let currentTime = new Date().getTime();
+        let elapsedTime = (currentTime - startTime) / 1000;
+        let seconds = elapsedTime.toFixed(1); // display seconds with 3 decimal places
+        timeSpan.innerText = `(${seconds}s)`;
+        requestAnimationFrame(updateTime);
+      }
+      updateTime();
+    }
+
+    function hideLoading() {
+      const loading = document.getElementById('loading-toast');
+      if (loading) loading.remove();
+    }
+
+    function showToast(msg, type = 'info') {
+      let toast = document.createElement('div');
+      toast.textContent = msg;
+      Object.assign(toast.style, {
+        position: 'fixed',
+        top: '2.5%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        background: type === 'success' ? '#38a169' : type === 'error' ? '#e53e3e' : '#3182ce',
+        color: '#fff',
+        padding: '1em 2em',
+        borderRadius: '1.5em',
+        fontWeight: '700',
+        fontSize: '1.1em',
+        boxShadow: '0 2px 16px rgba(66,153,225,0.18)',
+        zIndex: 9999,
+        opacity: 0.95
+      });
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2200);
+    }
+
+    document.getElementById("textForm").onsubmit = async (e) => {
+      e.preventDefault();
+      showLoading();
+      output.innerHTML = '';
+      output.style.display = 'block';
+      const text = document.getElementById("text").value;
+      try {
+        const res = await fetch("http://localhost:8000/process-text", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text })
+        });
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+        hideLoading();
+        if (data && (data.suggested_codes?.length || data.problem)) {
+          showToast('Fetched successfully!', 'success');
+          renderResponse(data);
+        } else {
+          showToast('No codes found.', 'error');
+          output.innerHTML = '<span style="color:#e53e3e;">No codes found for this input.</span>';
+        }
+      } catch (err) {
+        hideLoading();
+        showToast('Error fetching data!', 'error');
+        output.innerHTML = '<span style="color:#e53e3e;">Error fetching data.</span>';
+      }
+    };
+
+    // Only re-render on resize, do not re-fetch
+    window.addEventListener('resize', () => {
+      const newMode = isMobile() ? 'mobile' : 'desktop';
+      if (newMode !== currentRenderMode && lastResponse) {
+        currentRenderMode = newMode;
+        renderResponse(lastResponse);
+      }
+    });
+
+    // Theme logic (single source of truth)
+    function applyTheme(theme) {
+      document.body.classList.toggle('dark', theme === 'dark');
+      icon.textContent = theme === 'dark' ? '🌘' : '🌞';
+      icon.style.transform = "rotate(0deg)";
+      setTimeout(() => icon.style.transform = "rotate(360deg)", 10);
+      icon.style.transition = "transform 0.5s ease-in-out";
+    }
+    toggleBtn.onclick = () => {
+      const newTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
+      localStorage.setItem('theme', newTheme);
+      applyTheme(newTheme);
+    };
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('theme') || 'light';
+      applyTheme(saved);
+    });
+  </script>
+</body>
+
+</html>
