@@ -249,6 +249,17 @@
     body.dark .percent-label {
       color: #e2e8f0 !important;
     }
+    .code-block {
+    background: #f0f4f8;
+    border-left: 4px solid #3182ce;
+    padding: 1em;
+    margin-bottom: 1em;
+    border-radius: 0.5em;
+  }
+  .code-block h3 {
+    margin-top: 0;
+    color: #2c5282;
+  }
   </style>
 </head>
 
@@ -289,6 +300,60 @@
       const brightness = (r * 299 + g * 587 + b * 114) / 1000;
       return brightness > 140 ? '#1a202c' : '#f7fafc';
     }
+
+    function renderStructuredICD10Response(data) {
+  if (!data) return;
+
+  let html = `<h2>📋 Extracted ICD-10 Information</h2>`;
+
+  if (data.primary_diagnosis_code) {
+    html += `
+      <div class="code-block">
+        <h3>🟩 Primary Diagnosis</h3>
+        <div><b>Code:</b> ${data.primary_diagnosis_code.code}</div>
+        <div><b>Description:</b> ${data.primary_diagnosis_code.description}</div>
+      </div>`;
+  }
+
+  if (data.related_conditions_codes?.length) {
+    html += `
+      <div class="code-block">
+        <h3>🟨 Related Conditions</h3>
+        <ul>${data.related_conditions_codes.map(code => `
+          <li><b>${code.code}</b>: ${code.description}</li>`).join('')}
+        </ul>
+      </div>`;
+  }
+
+  if (data.all_related_additional_codes?.length) {
+    html += `
+      <div class="code-block">
+        <h3>🟦 Additional Z-Codes</h3>
+        <ul>${data.all_related_additional_codes.map(code => `
+          <li><b>${code.code}</b>: ${code.description}</li>`).join('')}
+        </ul>
+      </div>`;
+  }
+
+  if (data.explanation) {
+    html += `
+      <div class="code-block">
+        <h3>📝 Explanation</h3>
+        <div>${data.explanation}</div>
+      </div>`;
+  }
+
+  html += `<div class="code-block">
+      <b>Combo Code Used:</b> ${data.combo_code ? "✅ Yes" : "❌ No"}<br/>
+      <b>Multiple Codes Involved:</b> ${data.many_codes ? "✅ Yes" : "❌ No"}<br/>
+      <b>Unspecified Code Present:</b> ${data.is_unspecified_code_used ? "⚠️ Yes" : "❌ No"}<br/>
+      <b>Requires Query:</b> ${data.requires_query ? "🟠 Yes" : "✅ No"}
+    </div>`;
+
+  output.innerHTML = html;
+  output.style.display = 'block';
+}
+
 
     function renderResponse(data) {
       lastResponse = data;
@@ -433,7 +498,7 @@
       output.style.display = 'block';
       const text = document.getElementById("text").value;
       try {
-        const res = await fetch("http://localhost:8000/process-text", {
+        const res = await fetch("http://localhost:8000/icd10-plus-codes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text })
@@ -443,7 +508,12 @@
         hideLoading();
         if (data && (data.suggested_codes?.length || data.problem)) {
           showToast('Fetched successfully!', 'success');
-          renderResponse(data);
+         if (data.primary_diagnosis_code) {
+  renderStructuredICD10Response(data);
+} else {
+  renderResponse(data); // fallback for other formats
+}
+
         } else {
           showToast('No codes found.', 'error');
           output.innerHTML = '<span style="color:#e53e3e;">No codes found for this input.</span>';
