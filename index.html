@@ -508,11 +508,11 @@
         hideLoading();
         if (data && (data.suggested_codes?.length || data.problem)) {
           showToast('Fetched successfully!', 'success');
-         if (data.primary_diagnosis_code) {
-  renderStructuredICD10Response(data);
-} else {
+         //if (data.primary_diagnosis_code) {
+ // renderStructuredICD10Response(data);
+//} else {
   renderResponse(data); // fallback for other formats
-}
+//}
 
         } else {
           showToast('No codes found.', 'error');
